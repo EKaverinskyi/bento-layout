@@ -1,0 +1,12 @@
+# Git hooks. Install once with: lefthook install
+pre-commit:
+  parallel: true
+  commands:
+    markdown-format:
+      glob: "*.md"
+      run: npx --yes prettier@3.6.2 --check {staged_files}
+    markdown-lint:
+      glob: "*.md"
+      run: npx --yes markdownlint-cli2@0.18.1 {staged_files}
+    whitespace:
+      run: git diff --cached --check

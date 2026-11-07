@@ -1,0 +1,15 @@
+# markdownlint-cli2 configuration
+config:
+  default: true
+  MD013: false # line length: long prose lines and tables are fine
+  MD024:
+    siblings_only: true # same heading text allowed under different parents
+  MD033: false # inline HTML allowed
+  MD036: false # bold text used as a label is fine
+  MD060: false # table column style is left to prettier
+globs:
+  - "**/*.md"
+ignores:
+  - "node_modules/**"
+  - "stash-card.md" # original draft, kept as is
+  - "scratch/**"
