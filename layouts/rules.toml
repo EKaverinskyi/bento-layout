@@ -1,0 +1,52 @@
+# Universal rules: every layout in layouts/ must pass all of these.
+# Layout-specific rules (prefix L) and scenarios live in the layout's own file.
+# Ids are stable: U01 (a top-level folder limit) was dropped on purpose and is not reused.
+# The id U09 was once used for symlink validity, which was removed (symlinks are out of scope); it is reused here.
+# If a rule fails, change the layout or change the rule (and say why).
+# Rule types are implemented in check_layout.py.
+
+[[rule]]
+id = "U02"
+type = "top_level_name"
+pattern = "^[a-z]+$"
+text = "Top-level names are a single lowercase word."
+
+[[rule]]
+id = "U03"
+type = "name"
+pattern = "^[a-z0-9]+(-[a-z0-9]+)*$"
+text = "Every folder name is lowercase, with no spaces or special characters; a hyphen is the only separator."
+
+[[rule]]
+id = "U04"
+type = "max_depth"
+value = 3
+text = "No folder is deeper than 3 levels below the root."
+
+[[rule]]
+id = "U05"
+type = "has_description"
+text = "Every folder has a one-line description of what belongs in it."
+
+[[rule]]
+id = "U06"
+type = "forbidden_names"
+names = ["bin", "cache", "tmp", "temp", "system", "misc", "other", "stuff"]
+scope = "top_level"
+text = "No top-level folder for executables (bin lives inside its area), caches, temp or system files, and no catch-all names; the only catch-all is unsorted."
+
+[[rule]]
+id = "U07"
+type = "scenarios_resolve"
+text = "Every scenario in the layout file has exactly one expected home, and that home exists in the layout."
+
+[[rule]]
+id = "U08"
+type = "no_dead_top_level"
+text = "Every top-level folder is the home of at least one scenario, so none is unused."
+
+[[rule]]
+id = "U09"
+type = "sibling_prefix"
+max_shared = 3
+text = "Sibling folders are told apart by tab completion within 4 characters: no two siblings share more than their first 3 characters, which also rules out near-duplicates like programming/programms."
