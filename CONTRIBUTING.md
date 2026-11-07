@@ -3,9 +3,25 @@
 ## Setup
 
 1. Install [lefthook](https://lefthook.dev/installation/) (`brew install lefthook`) and Node.js (for markdown checks).
-2. Run `lefthook install` once in the repository.
+2. Install the latest stable [Go](https://go.dev/dl/); `cmd/go.mod` sets the minimum version.
+3. Install [golangci-lint](https://golangci-lint.run/) v2 built with that Go version or newer: `go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest`. A binary built with an older Go (such as an outdated Homebrew bottle) refuses to run.
+4. Run `lefthook install` once in the repository.
 
-Commits that fail the markdown format or lint checks are blocked locally.
+Commits that fail the markdown or Go checks are blocked locally.
+
+## Go code
+
+The Go module lives in `cmd/`; run `go` commands from there. From the repository root, use `make`:
+
+| Command      | What it does                                    |
+| ------------ | ----------------------------------------------- |
+| `make build` | Build the `bento-layout` binary                 |
+| `make test`  | Run tests with the race detector                |
+| `make lint`  | Run golangci-lint (config: `cmd/.golangci.yml`) |
+| `make fmt`   | Format Go code                                  |
+| `make check` | Run lint and tests                              |
+
+Run `make help` for the full list. The pre-commit hook runs only the linter; run `make test` yourself before opening a pull request.
 
 ## Checks
 

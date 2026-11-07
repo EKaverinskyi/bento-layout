@@ -10,3 +10,7 @@ pre-commit:
       run: npx --yes markdownlint-cli2@0.18.1 {staged_files}
     whitespace:
       run: git diff --cached --check
+    go-lint:
+      glob: "*.go"
+      root: cmd/
+      run: golangci-lint run ./...
