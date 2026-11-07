@@ -1,0 +1,133 @@
+# Every folder is listed by its path relative to the root of the layout on the drive.
+# Flags (all optional, default false):
+#   on_path          folder is added to PATH (holds executables)
+#   manifest_exclude contents are skipped by the checksum manifest
+
+[[folder]]
+path = "dev"
+description = "Programming projects I develop (git repositories)."
+
+[[folder]]
+path = "dev/personal"
+description = "Own side projects."
+
+[[folder]]
+path = "dev/work"
+description = "Employer and client code."
+
+[[folder]]
+path = "dev/community"
+description = "Contributions to and forks of other people's projects."
+
+[[folder]]
+path = "dev/learning"
+description = "Tutorials, courses, experiments, throwaway code."
+
+[[folder]]
+path = "projects"
+description = "Non-programming projects, split by kind."
+
+# The user extends this over time (for example projects/3d-modelling).
+[[folder]]
+path = "projects/3d"
+description = "3D projects (Blender and similar)."
+
+[[folder]]
+path = "projects/animation"
+description = "Animation projects."
+
+[[folder]]
+path = "projects/video"
+description = "Video editing projects."
+
+[[folder]]
+path = "programs"
+description = "Software I use but do not develop, including cloned repos I only pull and run."
+
+[[folder]]
+path = "programs/bin"
+description = "Executables and AppImages for programs."
+on_path = true
+
+[[folder]]
+path = "games"
+description = "Game installs, saves and settings."
+manifest_exclude = true
+
+[[folder]]
+path = "games/bin"
+description = "Game launchers and executables."
+on_path = true
+
+[[folder]]
+path = "media"
+description = "Standalone media files that belong to no project."
+
+[[folder]]
+path = "media/pictures"
+description = "Standalone pictures, split by subtype."
+
+[[folder]]
+path = "media/pictures/memes"
+description = "Memes."
+
+[[folder]]
+path = "media/pictures/screenshots"
+description = "Screenshots."
+
+[[folder]]
+path = "media/pictures/wallpapers"
+description = "Wallpapers."
+
+[[folder]]
+path = "media/music"
+description = "Music."
+
+[[folder]]
+path = "media/audio"
+description = "Podcasts and recordings."
+
+[[folder]]
+path = "media/videos"
+description = "Films and recordings."
+
+[[folder]]
+path = "books"
+description = "Books, PDFs and papers."
+
+[[folder]]
+path = "documents"
+description = "Contracts, notes, scans and non-code work files."
+
+[[folder]]
+path = "documents/work"
+description = "Work documents that are not code."
+
+[[folder]]
+path = "documents/personal"
+description = "Personal documents and notes."
+
+[[folder]]
+path = "documents/legal"
+description = "Contracts and legal paperwork."
+
+[[folder]]
+path = "config"
+description = "Dotfiles and application configuration."
+
+[[folder]]
+path = "config/secrets"
+description = "Keys, tokens and credentials. Treated like any other folder for now."
+
+[[folder]]
+path = "rebuildable"
+description = "Re-downloadable bulk data that is not a game (ISOs, datasets, container images)."
+manifest_exclude = true
+
+[[folder]]
+path = "unsorted"
+description = "My own inbox: files I drop in by hand before deciding where they go. Emptied regularly."
+
+[[folder]]
+path = "downloads"
+description = "Files downloaded from the internet, until each one is sorted."

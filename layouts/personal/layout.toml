@@ -1,0 +1,5 @@
+# Layout metadata. Folders, rules and scenarios live in the other files of this directory.
+
+[layout]
+name = "personal"
+description = "Type first, purpose below it. Projects keep their own files; dev and non-code projects are separate."

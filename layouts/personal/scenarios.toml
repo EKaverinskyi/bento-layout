@@ -1,0 +1,107 @@
+# Scenarios: concrete items and the single folder each belongs in.
+# They encode the interview rules (project wins, files stay with their project, program vs project, inbox).
+# Items that belong to a project name the container the project sits in; the project folder itself is below it.
+
+[[scenario]]
+item = "Downloaded meme"
+home = "media/pictures/memes"
+
+[[scenario]]
+item = "Screenshot with no project"
+home = "media/pictures/screenshots"
+
+[[scenario]]
+item = "Wallpaper"
+home = "media/pictures/wallpapers"
+
+[[scenario]]
+item = "Album of music"
+home = "media/music"
+
+[[scenario]]
+item = "Podcast episode"
+home = "media/audio"
+
+[[scenario]]
+item = "Downloaded film"
+home = "media/videos"
+
+[[scenario]]
+item = "Book PDF"
+home = "books"
+
+[[scenario]]
+item = "Employment contract scan"
+home = "documents/legal"
+
+[[scenario]]
+item = "Meeting notes for work (not code)"
+home = "documents/work"
+
+[[scenario]]
+item = "Personal notes"
+home = "documents/personal"
+
+[[scenario]]
+item = "Dotfile or app config"
+home = "config"
+
+[[scenario]]
+item = "SSH key or API token"
+home = "config/secrets"
+
+[[scenario]]
+item = "Git repo of my own side project, including its compiled binary and assets"
+home = "dev/personal"
+
+[[scenario]]
+item = "Employer git repo and its build output"
+home = "dev/work"
+
+[[scenario]]
+item = "Clone of someone else's repo where I commit changes"
+home = "dev/community"
+
+[[scenario]]
+item = "Tutorial or course code"
+home = "dev/learning"
+
+[[scenario]]
+item = "Blender project with textures and renders"
+home = "projects/3d"
+
+[[scenario]]
+item = "Animation project"
+home = "projects/animation"
+
+[[scenario]]
+item = "Video editing project"
+home = "projects/video"
+
+[[scenario]]
+item = "Cloned repo I only pull and run"
+home = "programs"
+
+[[scenario]]
+item = "Downloaded AppImage or static binary"
+home = "programs/bin"
+
+[[scenario]]
+item = "Minecraft install"
+home = "games"
+
+[[scenario]]
+item = "Game executable on PATH"
+home = "games/bin"
+
+[[scenario]]
+item = "Linux ISO or dataset"
+home = "rebuildable"
+
+[[scenario]]
+item = "File with no project and no known kind"
+home = "unsorted"
+
+[[scenario]]
+item = "File just saved by the browser"
+home = "downloads"

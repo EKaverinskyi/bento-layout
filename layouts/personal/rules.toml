@@ -1,0 +1,59 @@
+# Layout-specific rules. They are checked in addition to the universal rules in ../rules.toml.
+
+[[rule]]
+id = "L01"
+type = "on_path_exact"
+paths = ["programs/bin", "games/bin"]
+text = "Executables live in a bin folder inside their area; exactly programs/bin and games/bin are on PATH."
+
+[[rule]]
+id = "L02"
+type = "exact_children"
+parent = "dev"
+children = ["personal", "work", "community", "learning"]
+text = "Programming projects are split by purpose: personal, work, community, learning."
+
+[[rule]]
+id = "L03"
+type = "all_exist"
+paths = ["dev", "projects"]
+text = "Programming (dev) and non-programming (projects) are separate top-level folders."
+
+[[rule]]
+id = "L04"
+type = "exact_children"
+parent = "documents"
+children = ["work", "personal", "legal"]
+text = "Documents are split by purpose: work, personal, legal."
+
+[[rule]]
+id = "L05"
+type = "exact_children"
+parent = "media"
+children = ["pictures", "music", "audio", "videos"]
+text = "Standalone media is grouped under media: pictures, music, audio, videos."
+
+[[rule]]
+id = "L06"
+type = "exact_children"
+parent = "media/pictures"
+children = ["memes", "screenshots", "wallpapers"]
+text = "Pictures are split by subtype."
+
+[[rule]]
+id = "L07"
+type = "all_exist"
+paths = ["config/secrets"]
+text = "Secrets live inside config, in config/secrets."
+
+[[rule]]
+id = "L08"
+type = "manifest_exclude_exact"
+paths = ["games", "rebuildable"]
+text = "Rebuildable data (games and rebuildable) is excluded from the manifest, and nothing else is."
+
+[[rule]]
+id = "L09"
+type = "no_children"
+path = "unsorted"
+text = "The inbox is flat: unsorted has no subfolders."
