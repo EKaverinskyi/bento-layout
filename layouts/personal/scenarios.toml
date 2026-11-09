@@ -15,6 +15,10 @@ item = "Wallpaper"
 home = "media/pictures/wallpapers"
 
 [[scenario]]
+item = "Holiday photos from a camera or phone"
+home = "media/photos"
+
+[[scenario]]
 item = "Album of music"
 home = "media/music"
 
@@ -39,11 +43,23 @@ item = "Meeting notes for work (not code)"
 home = "documents/work"
 
 [[scenario]]
+item = "Utility invoice or tax return"
+home = "documents/finance"
+
+[[scenario]]
+item = "Passport scan"
+home = "documents/identity"
+
+[[scenario]]
+item = "Medical test results"
+home = "documents/health"
+
+[[scenario]]
 item = "Personal notes"
 home = "documents/personal"
 
 [[scenario]]
-item = "Dotfile or app config"
+item = "Dotfile such as .bashrc or .gitconfig, linked into the home directory"
 home = "config"
 
 [[scenario]]
@@ -99,7 +115,7 @@ item = "Linux ISO or dataset"
 home = "rebuildable"
 
 [[scenario]]
-item = "File with no project and no known kind"
+item = "Existing file from an old disk or another machine, not yet placed in bento"
 home = "unsorted"
 
 [[scenario]]

@@ -64,8 +64,12 @@ path = "media"
 description = "Standalone media files that belong to no project."
 
 [[folder]]
+path = "media/photos"
+description = "Photos taken with a camera or phone."
+
+[[folder]]
 path = "media/pictures"
-description = "Standalone pictures, split by subtype."
+description = "Generic images that are not photos, split by subtype."
 
 [[folder]]
 path = "media/pictures/memes"
@@ -105,15 +109,27 @@ description = "Work documents that are not code."
 
 [[folder]]
 path = "documents/personal"
-description = "Personal documents and notes."
+description = "Personal notes, recipes and anything that fits no other documents folder."
 
 [[folder]]
 path = "documents/legal"
-description = "Contracts and legal paperwork."
+description = "Contracts, leases, insurance policies and other signed agreements."
+
+[[folder]]
+path = "documents/finance"
+description = "Invoices, receipts, tax, bank statements, payslips and budgets."
+
+[[folder]]
+path = "documents/identity"
+description = "Passport, ID cards, certificates and diplomas."
+
+[[folder]]
+path = "documents/health"
+description = "Medical records, prescriptions and vaccination papers."
 
 [[folder]]
 path = "config"
-description = "Dotfiles and application configuration."
+description = "Dotfiles (shell, git) kept as a git repo and linked into the home directory; secrets live in secrets."
 
 [[folder]]
 path = "config/secrets"
@@ -126,8 +142,8 @@ manifest_exclude = true
 
 [[folder]]
 path = "unsorted"
-description = "My own inbox: files I drop in by hand before deciding where they go. Emptied regularly."
+description = "Inbox for files I already have from elsewhere (old disks, other machines) and have not yet placed in bento. Emptied regularly."
 
 [[folder]]
 path = "downloads"
-description = "Files downloaded from the internet, until each one is sorted."
+description = "Inbox for newly downloaded files, until each one is sorted."

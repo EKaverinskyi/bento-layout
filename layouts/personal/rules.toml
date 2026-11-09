@@ -21,17 +21,15 @@ text = "Programming (dev) and non-programming (projects) are separate top-level 
 
 [[rule]]
 id = "L04"
-type = "exact_children"
-parent = "documents"
-children = ["work", "personal", "legal"]
-text = "Documents are split by purpose: work, personal, legal."
+type = "all_exist"
+paths = ["documents/work", "documents/personal", "documents/legal", "documents/finance", "documents/identity", "documents/health"]
+text = "Documents are grouped by subject: work, personal, legal, finance, identity and health always exist; more may be added."
 
 [[rule]]
 id = "L05"
-type = "exact_children"
-parent = "media"
-children = ["pictures", "music", "audio", "videos"]
-text = "Standalone media is grouped under media: pictures, music, audio, videos."
+type = "all_exist"
+paths = ["media/photos", "media/pictures", "media/music", "media/audio", "media/videos"]
+text = "Standalone media is grouped under media: photos, pictures, music, audio, videos always exist; more may be added."
 
 [[rule]]
 id = "L06"
