@@ -1,4 +1,4 @@
-module github.com/EduardKav/bento-layout
+module github.com/EKaverinskyi/bento-layout
 
 go 1.27.3
 

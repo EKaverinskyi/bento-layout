@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/EduardKav/bento-layout/internal/version"
+	"github.com/EKaverinskyi/bento-layout/internal/version"
 )
 
 // NewRootCmd builds the root command. Output streams are injected for testing.
