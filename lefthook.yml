@@ -12,5 +12,4 @@ pre-commit:
       run: git diff --cached --check
     go-lint:
       glob: "*.go"
-      root: cmd/
       run: golangci-lint run ./...

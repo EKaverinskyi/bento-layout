@@ -13,6 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Repository boilerplate: README, license, editor and git settings, markdown linting and pre-commit hooks.
 - First layout definition, `personal`, in `layouts/personal/`: the folder tree, layout-specific rules and scenarios.
 - Universal layout rules that every layout must follow, in `layouts/rules.toml`.
-- Go project skeleton in `cmd/`: a cobra CLI with a `version` command.
+- Go project skeleton: a cobra CLI with a `version` command.
 - Makefile with `build`, `test`, `lint`, `fmt` and `check` targets, and golangci-lint configuration with a pre-commit hook.
 - GitHub Actions CI on every push: markdown checks, Go lint and tests on Linux and macOS. Binaries for all four target platforms are built only on version tags.

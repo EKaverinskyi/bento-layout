@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/EduardKav/bento-layout/cmd/internal/version"
+	"github.com/EduardKav/bento-layout/internal/version"
 )
 
 func newVersionCmd() *cobra.Command {
