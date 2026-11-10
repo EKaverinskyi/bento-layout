@@ -1,0 +1,42 @@
+name: Build
+
+# Builds binaries for all target platforms on every branch push and uploads them
+# as artifacts (kept 30 days) so a branch can be tried. Releases are built by
+# release.yml on version tags.
+on:
+  push:
+    branches: ["**"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    timeout-minutes: 10
+    name: build (${{ matrix.goos }}/${{ matrix.goarch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { goos: linux, goarch: amd64 }
+          - { goos: linux, goarch: arm64 } # best effort
+          - { goos: darwin, goarch: arm64 }
+          - { goos: darwin, goarch: amd64 } # best effort
+    runs-on: ubuntu-latest
+    env:
+      CGO_ENABLED: "0"
+      GOOS: ${{ matrix.goos }}
+      GOARCH: ${{ matrix.goarch }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-go@v7.0.0
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+      - run: make build BIN=bento-layout-${{ matrix.goos }}-${{ matrix.goarch }}
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: bento-layout-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: bento-layout-${{ matrix.goos }}-${{ matrix.goarch }}
+          retention-days: 30
+          if-no-files-found: error

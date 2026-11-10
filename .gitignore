@@ -10,6 +10,9 @@ Thumbs.db
 # Claude Code local settings
 .claude/settings.local.json
 
-
 # Local scratch space for notes, temporary markdown and other uncommitted files
 /scratch/
+
+# Build output
+/bento-layout
+/dist/

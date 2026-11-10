@@ -1,0 +1,62 @@
+name: CI
+
+# Runs on every push to any branch. Builds happen only on tags: build.yml calls
+# this workflow first and builds only if it succeeds.
+on:
+  push:
+    branches: ["**"]
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  markdown:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: lts/*
+      - run: npx --yes prettier@3.6.2 --check "**/*.md"
+      - run: npx --yes markdownlint-cli2@0.18.1
+
+  lint:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-go@v7.0.0
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+      - name: Lint workflow files
+        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+      - name: Check GoReleaser config
+        uses: goreleaser/goreleaser-action@v7.3.0
+        with:
+          version: v2.20.0
+          args: check
+      - name: Check go.mod and go.sum are tidy
+        run: go mod tidy -diff
+      - uses: golangci/golangci-lint-action@v9.3.0
+        with:
+          version: v2.15.0
+
+  test:
+    name: test (${{ matrix.os }})
+    needs: [markdown, lint] # tests run only after all files pass the checks
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest] # linux amd64 and macOS Apple Silicon
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-go@v7.0.0
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+      - run: make test

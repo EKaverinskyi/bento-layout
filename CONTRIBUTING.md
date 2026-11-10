@@ -3,9 +3,25 @@
 ## Setup
 
 1. Install [lefthook](https://lefthook.dev/installation/) (`brew install lefthook`) and Node.js (for markdown checks).
-2. Run `lefthook install` once in the repository.
+2. Install the latest stable [Go](https://go.dev/dl/); `go.mod` sets the minimum version.
+3. Install [golangci-lint](https://golangci-lint.run/) v2 (`brew install golangci-lint`). It refuses to run if it was built with an older Go minor version than the one in `go.mod`; in that case upgrade it or build it yourself: `go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest`.
+4. Run `lefthook install` once in the repository.
 
-Commits that fail the markdown format or lint checks are blocked locally.
+Commits that fail the markdown or Go checks are blocked locally.
+
+## Go code
+
+The Go module is at the repository root: `cmd/bento-layout` holds `main` and `internal/` holds the packages. Use `make` or plain `go` commands:
+
+| Command      | What it does                                |
+| ------------ | ------------------------------------------- |
+| `make build` | Build the `bento-layout` binary             |
+| `make test`  | Run tests with the race detector            |
+| `make lint`  | Run golangci-lint (config: `.golangci.yml`) |
+| `make fmt`   | Format Go code                              |
+| `make check` | Run lint and tests                          |
+
+Run `make help` for the full list. The pre-commit hook runs only the linter; run `make test` yourself before opening a pull request.
 
 ## Checks
 
@@ -17,6 +33,19 @@ npx --yes markdownlint-cli2@0.18.1
 ```
 
 Fix formatting automatically with `npx --yes prettier@3.6.2 --write "**/*.md"`.
+
+## Continuous integration
+
+GitHub Actions runs on every push, to any branch:
+
+- `CI` (`ci.yml`): markdown format and lint, workflow lint (actionlint), `go mod tidy` check and golangci-lint, then `go test -race` on Linux and macOS. Tests run only after the checks pass.
+- `Build` (`build.yml`): builds binaries for Linux and macOS (amd64 and arm64) and keeps them as workflow artifacts for 30 days, so you can download and try a branch.
+
+## Releases
+
+Releases are made by pushing a version tag, for example `git tag v0.1.0 && git push origin v0.1.0`. The `Release` workflow (`release.yml`) runs CI on the tag first. If it passes, [GoReleaser](https://goreleaser.com/) (configured in `.goreleaser.yaml`) builds the binaries, packs them as `tar.gz` archives with a checksums file, and publishes them as a GitHub Release with a changelog generated from the commit messages. Tags with a suffix such as `v0.1.0-rc.1` are marked as pre-releases.
+
+Try the release build locally without publishing anything: `goreleaser release --snapshot --clean` (output goes to `dist/`).
 
 ## Conventions
 

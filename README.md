@@ -4,13 +4,13 @@ A standard folder layout for a portable drive, plus a small CLI to create and ch
 
 **Not to be confused with "bento grid" UI design.** `bento-layout` is a tool for folder layout management. The name comes from the bento box: one container with fixed compartments.
 
-> **Status:** pre-alpha. The layout is still being designed and there is no code yet. See the [roadmap](ROADMAP.md).
+> **Status:** pre-alpha. The layout is still being designed. The CLI is only a skeleton (it can print its version) and layout creation and checking are not implemented yet. See the [roadmap](ROADMAP.md).
 
 ## Idea
 
 One folder on a drive holds all your portable data in a predictable, shell-friendly layout: lowercase names, no spaces, no special characters. The same layout on every drive and every machine.
 
-A small CLI tool will help manage the layout: creating it, checking that a drive follows it, and, later, optionally integrating it with [zoxide](https://github.com/ajeetdsouza/zoxide) for quick navigation. Its exact commands and options will be defined in later phases of the [roadmap](ROADMAP.md).
+A small CLI tool (written in Go) will help manage the layout: creating it, checking that a drive follows it, and, later, optionally integrating it with [zoxide](https://github.com/ajeetdsouza/zoxide) for quick navigation. Its exact commands and options will be defined in later phases of the [roadmap](ROADMAP.md).
 
 ## Layout
 
