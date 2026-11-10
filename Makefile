@@ -1,4 +1,4 @@
-MODULE  := github.com/EduardKav/bento-layout
+MODULE  := github.com/EKaverinskyi/bento-layout
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS := -X $(MODULE)/internal/version.Version=$(VERSION)
 BIN     := bento-layout

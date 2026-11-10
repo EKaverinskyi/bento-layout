@@ -4,7 +4,7 @@ package main
 import (
 	"os"
 
-	"github.com/EduardKav/bento-layout/internal/cli"
+	"github.com/EKaverinskyi/bento-layout/internal/cli"
 )
 
 func main() {

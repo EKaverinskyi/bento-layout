@@ -15,4 +15,4 @@ formatters:
   settings:
     goimports:
       local-prefixes:
-        - github.com/EduardKav/bento-layout
+        - github.com/EKaverinskyi/bento-layout
