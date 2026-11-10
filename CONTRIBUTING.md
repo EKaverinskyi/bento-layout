@@ -41,6 +41,12 @@ GitHub Actions runs on every push, to any branch:
 - `CI` (`ci.yml`): markdown format and lint, workflow lint (actionlint), `go mod tidy` check and golangci-lint, then `go test -race` on Linux and macOS. Tests run only after the checks pass.
 - `Build` (`build.yml`): builds binaries for Linux and macOS (amd64 and arm64) and keeps them as workflow artifacts for 30 days, so you can download and try a branch.
 
+## Releases
+
+Releases are made by pushing a version tag, for example `git tag v0.1.0 && git push origin v0.1.0`. The `Release` workflow (`release.yml`) runs CI on the tag first. If it passes, [GoReleaser](https://goreleaser.com/) (configured in `.goreleaser.yaml`) builds the binaries, packs them as `tar.gz` archives with a checksums file, and publishes them as a GitHub Release with a changelog generated from the commit messages. Tags with a suffix such as `v0.1.0-rc.1` are marked as pre-releases.
+
+Try the release build locally without publishing anything: `goreleaser release --snapshot --clean` (output goes to `dist/`).
+
 ## Conventions
 
 - Branch from `main`; open a pull request for every change.

@@ -1,26 +1,17 @@
 name: Build
 
-# Builds binaries for all target platforms and uploads them as artifacts.
-# Branch pushes: built alongside CI.
-# Version tags: CI must pass first (tag -> CI -> build -> artifacts).
-# Artifacts are kept 30 days; permanent downloads belong in a GitHub Release.
+# Builds binaries for all target platforms on every branch push and uploads them
+# as artifacts (kept 30 days) so a branch can be tried. Releases are built by
+# release.yml on version tags.
 on:
   push:
     branches: ["**"]
-    tags: ["v*.*.*"]
 
 permissions:
   contents: read
 
 jobs:
-  ci:
-    if: startsWith(github.ref, 'refs/tags/')
-    uses: ./.github/workflows/ci.yml
-
   build:
-    needs: ci
-    # ci is skipped on branches (it has its own workflow trigger there); a failed or cancelled ci blocks the build.
-    if: ${{ !cancelled() && needs.ci.result != 'failure' }}
     timeout-minutes: 10
     name: build (${{ matrix.goos }}/${{ matrix.goarch }})
     strategy:
