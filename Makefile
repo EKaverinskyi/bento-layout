@@ -1,6 +1,7 @@
 # The Go module lives in cmd/.
 MODULE  := github.com/EduardKav/bento-layout/cmd
-VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
+# Tags for a module in cmd/ are prefixed (cmd/v1.2.3); strip it. Empty output (no git) falls back to dev.
+VERSION ?= $(or $(shell git describe --tags --always --dirty 2>/dev/null | sed 's|^cmd/||'),dev)
 LDFLAGS := -X $(MODULE)/internal/version.Version=$(VERSION)
 BIN     := bento-layout
 

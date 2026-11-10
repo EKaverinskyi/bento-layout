@@ -1,0 +1,44 @@
+name: Build
+
+# Flow: version tag -> CI (markdown, lint, tests) -> on success, build binaries -> artifacts.
+# The tag prefix depends on where the Go module lives (cmd/v1.2.3 for a module in cmd/).
+on:
+  push:
+    tags: ["v*.*.*", "cmd/v*.*.*"]
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    needs: ci
+    timeout-minutes: 10
+    name: build (${{ matrix.goos }}/${{ matrix.goarch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { goos: linux, goarch: amd64 }
+          - { goos: linux, goarch: arm64 } # best effort
+          - { goos: darwin, goarch: arm64 }
+          - { goos: darwin, goarch: amd64 } # best effort
+    runs-on: ubuntu-latest
+    env:
+      CGO_ENABLED: "0"
+      GOOS: ${{ matrix.goos }}
+      GOARCH: ${{ matrix.goarch }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-go@v7.0.0
+        with:
+          go-version-file: cmd/go.mod
+          cache-dependency-path: cmd/go.sum
+      - run: make build BIN=bento-layout-${{ matrix.goos }}-${{ matrix.goarch }}
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: bento-layout-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: bento-layout-${{ matrix.goos }}-${{ matrix.goarch }}
+          if-no-files-found: error
