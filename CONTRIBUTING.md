@@ -4,7 +4,7 @@
 
 1. Install [lefthook](https://lefthook.dev/installation/) (`brew install lefthook`) and Node.js (for markdown checks).
 2. Install the latest stable [Go](https://go.dev/dl/); `go.mod` sets the minimum version.
-3. Install [golangci-lint](https://golangci-lint.run/) v2 built with that Go version or newer: `go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest`. A binary built with an older Go (such as an outdated Homebrew bottle) refuses to run.
+3. Install [golangci-lint](https://golangci-lint.run/) v2 (`brew install golangci-lint`). It refuses to run if it was built with an older Go minor version than the one in `go.mod`; in that case upgrade it or build it yourself: `go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest`.
 4. Run `lefthook install` once in the repository.
 
 Commits that fail the markdown or Go checks are blocked locally.
@@ -33,6 +33,13 @@ npx --yes markdownlint-cli2@0.18.1
 ```
 
 Fix formatting automatically with `npx --yes prettier@3.6.2 --write "**/*.md"`.
+
+## Continuous integration
+
+GitHub Actions runs on every push, to any branch:
+
+- `CI` (`ci.yml`): markdown format and lint, workflow lint (actionlint), `go mod tidy` check and golangci-lint, then `go test -race` on Linux and macOS. Tests run only after the checks pass.
+- `Build` (`build.yml`): builds binaries for Linux and macOS (amd64 and arm64) and keeps them as workflow artifacts for 30 days, so you can download and try a branch.
 
 ## Conventions
 
