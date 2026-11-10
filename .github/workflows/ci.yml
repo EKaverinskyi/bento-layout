@@ -31,6 +31,8 @@ jobs:
         with:
           go-version-file: go.mod
           cache-dependency-path: go.sum
+      - name: Lint workflow files
+        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
       - name: Check go.mod and go.sum are tidy
         run: go mod tidy -diff
       # goinstall builds golangci-lint with the Go version above, so it can lint a module that targets the newest Go.

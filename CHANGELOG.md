@@ -15,4 +15,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Universal layout rules that every layout must follow, in `layouts/rules.toml`.
 - Go project skeleton: a cobra CLI with a `version` command.
 - Makefile with `build`, `test`, `lint`, `fmt` and `check` targets, and golangci-lint configuration with a pre-commit hook.
-- GitHub Actions CI on every push: markdown checks, Go lint and tests on Linux and macOS. Binaries for all four target platforms are built on every push and, after CI passes, on version tags. Artifacts are kept 30 days.
+- GitHub Actions CI on every push: markdown checks, Go lint, workflow lint (actionlint) and tests on Linux and macOS. Binaries for all four target platforms are built on every push and, after CI passes, on version tags. Artifacts are kept 30 days.
