@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `init <layout> [target]` command: loads a layout (by path or by name from `--layouts-dir`) and creates its folders; supports `--dry-run` and never changes existing folders.
+- Layout loader (`internal/layout`): reads any layout directory with the same structure and validates its folder paths.
 - Project description and high-level roadmap.
 - Repository boilerplate: README, license, editor and git settings, markdown linting and pre-commit hooks.
 - First layout definition, `personal`, in `layouts/personal/`: the folder tree, layout-specific rules and scenarios.
