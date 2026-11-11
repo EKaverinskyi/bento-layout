@@ -1,0 +1,5 @@
+[[rule]]
+id = "L01"
+type = "no_children"
+path = "beta"
+text = "Beta is flat."

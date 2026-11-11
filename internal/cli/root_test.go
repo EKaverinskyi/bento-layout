@@ -8,6 +8,9 @@ import (
 	"testing"
 )
 
+// layoutsDir holds the minimal layout used by all tests.
+var layoutsDir = filepath.Join("..", "..", "testdata", "layouts")
+
 func run(t *testing.T, args ...string) (code int, stdout, stderr string) {
 	t.Helper()
 	var out, errb bytes.Buffer
@@ -44,24 +47,23 @@ func TestUnknownCommand(t *testing.T) {
 
 func TestInitPersonal(t *testing.T) {
 	target := t.TempDir()
-	layouts := filepath.Join("..", "..", "layouts")
-	code, out, errOut := run(t, "init", "personal", target, "--layouts-dir", layouts)
+	code, out, errOut := run(t, "init", "mini", target, "--layouts-dir", layoutsDir)
 	if code != 0 {
 		t.Fatalf("code = %d, stderr = %q", code, errOut)
 	}
-	if !strings.Contains(out, "35 created") {
+	if !strings.Contains(out, "4 created, 0 already existed") {
 		t.Errorf("stdout = %q", out)
 	}
-	if st, err := os.Stat(filepath.Join(target, "media", "pictures", "memes")); err != nil || !st.IsDir() {
-		t.Errorf("media/pictures/memes missing: %v", err)
+	if st, err := os.Stat(filepath.Join(target, "alpha", "inner")); err != nil || !st.IsDir() {
+		t.Errorf("alpha/inner missing: %v", err)
 	}
 }
 
 func TestInitDryRun(t *testing.T) {
 	target := filepath.Join(t.TempDir(), "x")
-	dir := filepath.Join("..", "..", "layouts", "personal")
+	dir := filepath.Join(layoutsDir, "mini")
 	code, out, _ := run(t, "init", dir, target, "-n")
-	if code != 0 || !strings.Contains(out, "would create "+filepath.Join(target, "dev")+"\n") {
+	if code != 0 || !strings.Contains(out, "would create "+filepath.Join(target, "alpha")+"\n") {
 		t.Fatalf("code = %d, stdout = %q", code, out)
 	}
 	if _, err := os.Stat(target); err == nil {
@@ -77,30 +79,30 @@ func TestInitUnknownLayout(t *testing.T) {
 }
 
 func TestInitDryRunPathsRelativeToCwd(t *testing.T) {
-	dir, err := filepath.Abs(filepath.Join("..", "..", "layouts", "personal"))
+	dir, err := filepath.Abs(filepath.Join(layoutsDir, "mini"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	cwd := t.TempDir()
 	t.Chdir(cwd)
 	code, out, _ := run(t, "init", dir, "-n")
-	if code != 0 || !strings.Contains(out, "would create dev\n") ||
-		!strings.Contains(out, "would create dev"+string(filepath.Separator)+"work\n") {
+	if code != 0 || !strings.Contains(out, "would create alpha\n") ||
+		!strings.Contains(out, "would create alpha"+string(filepath.Separator)+"inner\n") {
 		t.Fatalf("target .: code = %d, stdout = %q", code, out)
 	}
 	code, out, _ = run(t, "init", dir, "sub/bento", "-n")
-	want := "would create " + filepath.Join("sub", "bento", "dev") + "\n"
+	want := "would create " + filepath.Join("sub", "bento", "alpha") + "\n"
 	if code != 0 || !strings.Contains(out, want) {
 		t.Fatalf("target sub/bento: code = %d, stdout = %q, want %q", code, out, want)
 	}
 	code, out, _ = run(t, "init", dir, filepath.Join(cwd, "abs"), "-n")
-	if code != 0 || !strings.Contains(out, "would create abs"+string(filepath.Separator)+"dev\n") {
+	if code != 0 || !strings.Contains(out, "would create abs"+string(filepath.Separator)+"alpha\n") {
 		t.Fatalf("absolute target: code = %d, stdout = %q", code, out)
 	}
 }
 
 func TestInitEmptyTarget(t *testing.T) {
-	dir, err := filepath.Abs(filepath.Join("..", "..", "layouts", "personal"))
+	dir, err := filepath.Abs(filepath.Join(layoutsDir, "mini"))
 	if err != nil {
 		t.Fatal(err)
 	}

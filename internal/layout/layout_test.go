@@ -3,6 +3,7 @@ package layout
 import (
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -22,23 +23,28 @@ func mini(t *testing.T, folders string) string {
 	return dir
 }
 
-func TestLoadRepoPersonal(t *testing.T) {
-	l, err := Load(filepath.Join("..", "..", "layouts", "personal"))
+func TestLoadMini(t *testing.T) {
+	l, err := Load(filepath.Join("..", "..", "testdata", "layouts", "mini"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if l.Name != "personal" || len(l.Folders) != 35 || len(l.Rules) == 0 || len(l.Scenarios) == 0 {
-		t.Errorf("unexpected layout: %q, %d folders, %d rules, %d scenarios",
-			l.Name, len(l.Folders), len(l.Rules), len(l.Scenarios))
+	want := &Layout{
+		Name:        "mini",
+		Description: "Test layout.",
+		Folders: []Folder{
+			{Path: "alpha", Description: "First top-level folder."},
+			{Path: "alpha/inner", Description: "Nested folder."},
+			{Path: "beta", Description: "Folder on PATH.", OnPath: true},
+			{Path: "gamma", Description: "Folder excluded from the manifest.", ManifestExclude: true},
+		},
+		Rules: []Rule{{
+			ID: "L01", Type: "no_children", Text: "Beta is flat.",
+			Params: map[string]any{"path": "beta"},
+		}},
+		Scenarios: []Scenario{{Item: "Test item", Home: "alpha/inner"}},
 	}
-	var onPath int
-	for _, f := range l.Folders {
-		if f.OnPath {
-			onPath++
-		}
-	}
-	if onPath != 2 {
-		t.Errorf("on_path folders = %d, want 2", onPath)
+	if !reflect.DeepEqual(l, want) {
+		t.Errorf("layout = %+v\nwant     %+v", l, want)
 	}
 }
 
