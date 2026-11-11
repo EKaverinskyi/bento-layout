@@ -98,3 +98,18 @@ func TestInitDryRunPathsRelativeToCwd(t *testing.T) {
 		t.Fatalf("absolute target: code = %d, stdout = %q", code, out)
 	}
 }
+
+func TestInitEmptyTarget(t *testing.T) {
+	dir, err := filepath.Abs(filepath.Join("..", "..", "layouts", "personal"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Chdir(t.TempDir())
+	code, _, errOut := run(t, "init", dir, "")
+	if code == 0 || !strings.Contains(errOut, "target is empty") {
+		t.Errorf("code = %d, stderr = %q", code, errOut)
+	}
+	if entries, _ := os.ReadDir("."); len(entries) != 0 {
+		t.Errorf("created %d entries despite error", len(entries))
+	}
+}

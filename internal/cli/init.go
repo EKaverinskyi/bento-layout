@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -25,6 +26,9 @@ folders.toml), or a layout name that is looked up in --layouts-dir.
 Existing folders are left untouched; nothing is ever deleted or renamed.`,
 		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 2 && args[1] == "" {
+				return errors.New("target is empty; omit it to use the current directory")
+			}
 			dir, err := resolveLayoutDir(args[0], layoutsDir)
 			if err != nil {
 				return err
