@@ -45,13 +45,13 @@ func TestUnknownCommand(t *testing.T) {
 	}
 }
 
-func TestInitPersonal(t *testing.T) {
+func TestInitByName(t *testing.T) {
 	target := t.TempDir()
 	code, out, errOut := run(t, "init", "mini", target, "--layouts-dir", layoutsDir)
 	if code != 0 {
 		t.Fatalf("code = %d, stderr = %q", code, errOut)
 	}
-	if !strings.Contains(out, "4 created, 0 already existed") {
+	if !strings.Contains(out, "created 4, 0 already existed") {
 		t.Errorf("stdout = %q", out)
 	}
 	if st, err := os.Stat(filepath.Join(target, "alpha", "inner")); err != nil || !st.IsDir() {
@@ -113,5 +113,42 @@ func TestInitEmptyTarget(t *testing.T) {
 	}
 	if entries, _ := os.ReadDir("."); len(entries) != 0 {
 		t.Errorf("created %d entries despite error", len(entries))
+	}
+}
+
+func TestInitRepairsDamagedLayout(t *testing.T) {
+	target := t.TempDir()
+	if code, _, errOut := run(t, "init", "mini", target, "--layouts-dir", layoutsDir); code != 0 {
+		t.Fatalf("first init: code = %d, stderr = %q", code, errOut)
+	}
+	// Damage the layout: remove one folder and put a file in another.
+	if err := os.Remove(filepath.Join(target, "gamma")); err != nil {
+		t.Fatal(err)
+	}
+	keep := filepath.Join(target, "alpha", "inner", "keep.txt")
+	if err := os.WriteFile(keep, []byte("data"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	code, out, errOut := run(t, "init", "mini", target, "--layouts-dir", layoutsDir)
+	if code != 0 {
+		t.Fatalf("second init: code = %d, stderr = %q", code, errOut)
+	}
+	if !strings.Contains(out, "created "+filepath.Join(target, "gamma")+"\n") {
+		t.Errorf("stdout = %q, want gamma reported as created", out)
+	}
+	for _, other := range []string{"alpha", "inner", "beta"} {
+		if strings.Contains(out, "created "+filepath.Join(target, other)+"\n") {
+			t.Errorf("stdout = %q, %s must not be recreated", out, other)
+		}
+	}
+	if !strings.Contains(out, "created 1, 3 already existed") {
+		t.Errorf("stdout = %q, want summary \"created 1, 3 already existed\"", out)
+	}
+	if st, err := os.Stat(filepath.Join(target, "gamma")); err != nil || !st.IsDir() {
+		t.Errorf("gamma not restored: %v", err)
+	}
+	if data, err := os.ReadFile(keep); err != nil || string(data) != "data" {
+		t.Errorf("existing file touched: %q, %v", data, err)
 	}
 }

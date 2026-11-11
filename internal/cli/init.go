@@ -55,8 +55,8 @@ Existing folders are left untouched; nothing is ever deleted or renamed.`,
 					return err
 				}
 			}
-			_, err = fmt.Fprintf(out, "layout %q in %s: %d %s, %d already existed\n",
-				l.Name, target, len(res.Created), verb, len(res.Existed))
+			_, err = fmt.Fprintf(out, "layout %q in %s: %s %d, %d already existed\n",
+				l.Name, target, verb, len(res.Created), len(res.Existed))
 			return err
 		},
 	}
