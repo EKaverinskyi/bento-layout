@@ -1,0 +1,5 @@
+# Minimal layout used only by tests. Tests assert its exact contents, so change it together with them.
+
+[layout]
+name = "mini"
+description = "Test layout."

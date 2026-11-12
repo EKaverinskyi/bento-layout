@@ -2,9 +2,14 @@ package cli
 
 import (
 	"bytes"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
+
+// layoutsDir holds the minimal layout used by all tests.
+var layoutsDir = filepath.Join("..", "..", "testdata", "layouts")
 
 func run(t *testing.T, args ...string) (code int, stdout, stderr string) {
 	t.Helper()
@@ -37,5 +42,113 @@ func TestUnknownCommand(t *testing.T) {
 	}
 	if !strings.Contains(errOut, "unknown command") {
 		t.Errorf("stderr = %q, want unknown command error", errOut)
+	}
+}
+
+func TestInitByName(t *testing.T) {
+	target := t.TempDir()
+	code, out, errOut := run(t, "init", "mini", target, "--layouts-dir", layoutsDir)
+	if code != 0 {
+		t.Fatalf("code = %d, stderr = %q", code, errOut)
+	}
+	if !strings.Contains(out, "created 4, 0 already existed") {
+		t.Errorf("stdout = %q", out)
+	}
+	if st, err := os.Stat(filepath.Join(target, "alpha", "inner")); err != nil || !st.IsDir() {
+		t.Errorf("alpha/inner missing: %v", err)
+	}
+}
+
+func TestInitDryRun(t *testing.T) {
+	target := filepath.Join(t.TempDir(), "x")
+	dir := filepath.Join(layoutsDir, "mini")
+	code, out, _ := run(t, "init", dir, target, "-n")
+	if code != 0 || !strings.Contains(out, "would create "+filepath.Join(target, "alpha")+"\n") {
+		t.Fatalf("code = %d, stdout = %q", code, out)
+	}
+	if _, err := os.Stat(target); err == nil {
+		t.Error("dry run created target")
+	}
+}
+
+func TestInitUnknownLayout(t *testing.T) {
+	code, _, errOut := run(t, "init", "nope", t.TempDir(), "--layouts-dir", t.TempDir())
+	if code == 0 || !strings.Contains(errOut, "not found") {
+		t.Errorf("code = %d, stderr = %q", code, errOut)
+	}
+}
+
+func TestInitDryRunPathsRelativeToCwd(t *testing.T) {
+	dir, err := filepath.Abs(filepath.Join(layoutsDir, "mini"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	cwd := t.TempDir()
+	t.Chdir(cwd)
+	code, out, _ := run(t, "init", dir, "-n")
+	if code != 0 || !strings.Contains(out, "would create alpha\n") ||
+		!strings.Contains(out, "would create alpha"+string(filepath.Separator)+"inner\n") {
+		t.Fatalf("target .: code = %d, stdout = %q", code, out)
+	}
+	code, out, _ = run(t, "init", dir, "sub/bento", "-n")
+	want := "would create " + filepath.Join("sub", "bento", "alpha") + "\n"
+	if code != 0 || !strings.Contains(out, want) {
+		t.Fatalf("target sub/bento: code = %d, stdout = %q, want %q", code, out, want)
+	}
+	code, out, _ = run(t, "init", dir, filepath.Join(cwd, "abs"), "-n")
+	if code != 0 || !strings.Contains(out, "would create abs"+string(filepath.Separator)+"alpha\n") {
+		t.Fatalf("absolute target: code = %d, stdout = %q", code, out)
+	}
+}
+
+func TestInitEmptyTarget(t *testing.T) {
+	dir, err := filepath.Abs(filepath.Join(layoutsDir, "mini"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Chdir(t.TempDir())
+	code, _, errOut := run(t, "init", dir, "")
+	if code == 0 || !strings.Contains(errOut, "target is empty") {
+		t.Errorf("code = %d, stderr = %q", code, errOut)
+	}
+	if entries, _ := os.ReadDir("."); len(entries) != 0 {
+		t.Errorf("created %d entries despite error", len(entries))
+	}
+}
+
+func TestInitRepairsDamagedLayout(t *testing.T) {
+	target := t.TempDir()
+	if code, _, errOut := run(t, "init", "mini", target, "--layouts-dir", layoutsDir); code != 0 {
+		t.Fatalf("first init: code = %d, stderr = %q", code, errOut)
+	}
+	// Damage the layout: remove one folder and put a file in another.
+	if err := os.Remove(filepath.Join(target, "gamma")); err != nil {
+		t.Fatal(err)
+	}
+	keep := filepath.Join(target, "alpha", "inner", "keep.txt")
+	if err := os.WriteFile(keep, []byte("data"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	code, out, errOut := run(t, "init", "mini", target, "--layouts-dir", layoutsDir)
+	if code != 0 {
+		t.Fatalf("second init: code = %d, stderr = %q", code, errOut)
+	}
+	if !strings.Contains(out, "created "+filepath.Join(target, "gamma")+"\n") {
+		t.Errorf("stdout = %q, want gamma reported as created", out)
+	}
+	for _, other := range []string{"alpha", "inner", "beta"} {
+		if strings.Contains(out, "created "+filepath.Join(target, other)+"\n") {
+			t.Errorf("stdout = %q, %s must not be recreated", out, other)
+		}
+	}
+	if !strings.Contains(out, "created 1, 3 already existed") {
+		t.Errorf("stdout = %q, want summary \"created 1, 3 already existed\"", out)
+	}
+	if st, err := os.Stat(filepath.Join(target, "gamma")); err != nil || !st.IsDir() {
+		t.Errorf("gamma not restored: %v", err)
+	}
+	if data, err := os.ReadFile(keep); err != nil || string(data) != "data" {
+		t.Errorf("existing file touched: %q, %v", data, err)
 	}
 }

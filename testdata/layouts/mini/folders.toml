@@ -1,0 +1,17 @@
+[[folder]]
+path = "alpha"
+description = "First top-level folder."
+
+[[folder]]
+path = "alpha/inner"
+description = "Nested folder."
+
+[[folder]]
+path = "beta"
+description = "Folder on PATH."
+on_path = true
+
+[[folder]]
+path = "gamma"
+description = "Folder excluded from the manifest."
+manifest_exclude = true

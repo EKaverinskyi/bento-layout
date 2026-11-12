@@ -21,7 +21,7 @@ func NewRootCmd(stdout, stderr io.Writer) *cobra.Command {
 	root.SetOut(stdout)
 	root.SetErr(stderr)
 	root.SetVersionTemplate("bento-layout {{.Version}}\n")
-	root.AddCommand(newVersionCmd())
+	root.AddCommand(newVersionCmd(), newInitCmd())
 	return root
 }
 
