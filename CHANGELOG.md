@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `init <layout> [target]` command: loads a layout (by path or by name from `--layouts-dir`) and creates its folders; supports `--dry-run` and never changes existing folders.
+- `check --layout <layout> --path <dir>` command and rule engine (ported from the Python prototype): both flags are required. Checks the layout against the universal rules (`--rules`, default `<layouts-dir>/rules.toml`) and its own rules and scenarios, then compares the real directory with it. Missing folders fail, extra folders are only listed. Exits 1 on any failure or incomplete layout.
+- `init <layout> <target>` command: loads a layout (by path or by name from `--layouts-dir`) and creates its folders in the given target directory (required; use `.` for the current one); supports `--dry-run` and never changes existing folders.
 - Layout loader (`internal/layout`): reads any layout directory with the same structure and validates its folder paths.
 - Project description and high-level roadmap.
 - Repository boilerplate: README, license, editor and git settings, markdown linting and pre-commit hooks.

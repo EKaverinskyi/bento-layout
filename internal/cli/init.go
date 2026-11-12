@@ -16,18 +16,20 @@ func newInitCmd() *cobra.Command {
 	var layoutsDir string
 	var dryRun bool
 	cmd := &cobra.Command{
-		Use:   "init <layout> [target]",
+		Use:   "init <layout> <target>",
 		Short: "Create the folder structure of a layout",
-		Long: `Create the folder structure of a layout below target (default: the current directory).
+		Long: `Create the folder structure of a layout below target, which is required.
+Use "." to create it in the current directory.
 
 <layout> is either a path to a layout directory (it contains layout.toml and
 folders.toml), or a layout name that is looked up in --layouts-dir.
 
 Existing folders are left untouched; nothing is ever deleted or renamed.`,
-		Args: cobra.RangeArgs(1, 2),
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) == 2 && args[1] == "" {
-				return errors.New("target is empty; omit it to use the current directory")
+			target := args[1]
+			if target == "" {
+				return errors.New("target is empty; pass a directory path (use . for the current directory)")
 			}
 			dir, err := resolveLayoutDir(args[0], layoutsDir)
 			if err != nil {
@@ -36,10 +38,6 @@ Existing folders are left untouched; nothing is ever deleted or renamed.`,
 			l, err := layout.Load(dir)
 			if err != nil {
 				return err
-			}
-			target := "."
-			if len(args) == 2 {
-				target = args[1]
 			}
 			res, err := layout.Create(l, target, dryRun)
 			if err != nil {

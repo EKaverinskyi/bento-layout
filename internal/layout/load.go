@@ -26,31 +26,45 @@ const (
 // Unknown keys in layout.toml, folders.toml and scenarios.toml are errors, so
 // typos are not silently ignored.
 func Load(dir string) (*Layout, error) {
+	l, err := Parse(dir)
+	if err != nil {
+		return nil, err
+	}
+	if err := l.Validate(); err != nil {
+		return nil, fmt.Errorf("layout %s: %w", dir, err)
+	}
+	return l, nil
+}
+
+// Parse reads the layout stored in dir without validating its structure, so
+// that Check can report structural problems as findings instead of failing.
+// Files are read as in Load.
+func Parse(dir string) (*Layout, error) {
 	var meta struct {
 		Layout struct {
 			Name        string `toml:"name"`
 			Description string `toml:"description"`
 		} `toml:"layout"`
 	}
-	if err := decodeFile(dir, metaFile, true, &meta); err != nil {
+	if err := decodeFile(dir, metaFile, true, true, &meta); err != nil {
 		return nil, err
 	}
 	var folders struct {
 		Folder []Folder `toml:"folder"`
 	}
-	if err := decodeFile(dir, foldersFile, true, &folders); err != nil {
+	if err := decodeFile(dir, foldersFile, true, true, &folders); err != nil {
 		return nil, err
 	}
 	var scenarios struct {
 		Scenario []Scenario `toml:"scenario"`
 	}
-	if err := decodeFile(dir, scenariosFile, false, &scenarios); err != nil {
+	if err := decodeFile(dir, scenariosFile, false, true, &scenarios); err != nil {
 		return nil, err
 	}
 	var rules struct {
 		Rule []map[string]any `toml:"rule"`
 	}
-	if err := decodeFile(dir, rulesFile, false, &rules); err != nil {
+	if err := decodeFile(dir, rulesFile, false, false, &rules); err != nil {
 		return nil, err
 	}
 
@@ -61,29 +75,48 @@ func Load(dir string) (*Layout, error) {
 		Scenarios:   scenarios.Scenario,
 	}
 	for _, raw := range rules.Rule {
-		r := Rule{Params: map[string]any{}}
-		for k, v := range raw {
-			switch k {
-			case "id":
-				r.ID, _ = v.(string)
-			case "type":
-				r.Type, _ = v.(string)
-			case "text":
-				r.Text, _ = v.(string)
-			default:
-				r.Params[k] = v
-			}
-		}
-		l.Rules = append(l.Rules, r)
-	}
-	if err := l.Validate(); err != nil {
-		return nil, fmt.Errorf("layout %s: %w", dir, err)
+		l.Rules = append(l.Rules, newRule(raw))
 	}
 	return l, nil
 }
 
+// LoadRules reads the rules from the TOML file at file (for example the
+// universal rules shared by all layouts). The file must exist.
+func LoadRules(file string) ([]Rule, error) {
+	var rules struct {
+		Rule []map[string]any `toml:"rule"`
+	}
+	if err := decodeFile(filepath.Dir(file), filepath.Base(file), true, false, &rules); err != nil {
+		return nil, err
+	}
+	out := make([]Rule, 0, len(rules.Rule))
+	for _, raw := range rules.Rule {
+		out = append(out, newRule(raw))
+	}
+	return out, nil
+}
+
+func newRule(raw map[string]any) Rule {
+	r := Rule{Params: map[string]any{}}
+	for k, v := range raw {
+		switch k {
+		case "id":
+			r.ID, _ = v.(string)
+		case "type":
+			r.Type, _ = v.(string)
+		case "text":
+			r.Text, _ = v.(string)
+		default:
+			r.Params[k] = v
+		}
+	}
+	return r
+}
+
 // decodeFile decodes dir/name into v. A missing optional file is not an error.
-func decodeFile(dir, name string, required bool, v any) error {
+// Rules carry free-form parameters, so rule files are decoded with strict off;
+// the other files reject unknown keys.
+func decodeFile(dir, name string, required, strict bool, v any) error {
 	p := filepath.Join(dir, name)
 	data, err := os.ReadFile(p)
 	if err != nil {
@@ -93,8 +126,7 @@ func decodeFile(dir, name string, required bool, v any) error {
 		return fmt.Errorf("read %s: %w", p, err)
 	}
 	dec := toml.NewDecoder(bytes.NewReader(data))
-	// Rules carry free-form parameters, so only the other files are strict.
-	if name != rulesFile {
+	if strict {
 		dec.DisallowUnknownFields()
 	}
 	if err := dec.Decode(v); err != nil {
@@ -117,20 +149,12 @@ func (l *Layout) Validate() error {
 	if len(l.Folders) == 0 {
 		return errors.New("layout has no folders")
 	}
+	if probs := l.structureProblems(); len(probs) > 0 {
+		return errors.New(probs[0])
+	}
 	seen := make(map[string]bool, len(l.Folders))
 	for _, f := range l.Folders {
-		if err := validatePath(f.Path); err != nil {
-			return fmt.Errorf("folder %q: %w", f.Path, err)
-		}
-		if seen[f.Path] {
-			return fmt.Errorf("folder %q is listed twice", f.Path)
-		}
 		seen[f.Path] = true
-	}
-	for _, f := range l.Folders {
-		if parent := path.Dir(f.Path); parent != "." && !seen[parent] {
-			return fmt.Errorf("folder %q: parent %q is not listed", f.Path, parent)
-		}
 	}
 	for _, s := range l.Scenarios {
 		if !seen[s.Home] {
@@ -138,6 +162,28 @@ func (l *Layout) Validate() error {
 		}
 	}
 	return nil
+}
+
+// structureProblems lists everything wrong with the folder tree itself:
+// unsafe paths, duplicates and unlisted parents.
+func (l *Layout) structureProblems() []string {
+	var out []string
+	seen := make(map[string]bool, len(l.Folders))
+	for _, f := range l.Folders {
+		if err := validatePath(f.Path); err != nil {
+			out = append(out, fmt.Sprintf("folder %q: %v", f.Path, err))
+		}
+		if seen[f.Path] {
+			out = append(out, fmt.Sprintf("folder %q is listed twice", f.Path))
+		}
+		seen[f.Path] = true
+	}
+	for _, f := range l.Folders {
+		if parent := path.Dir(f.Path); parent != "." && !seen[parent] {
+			out = append(out, fmt.Sprintf("folder %q: parent %q is not listed", f.Path, parent))
+		}
+	}
+	return out
 }
 
 func validatePath(p string) error {
