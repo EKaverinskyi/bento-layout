@@ -3,7 +3,7 @@
 # Ids are stable: U01 (a top-level folder limit) was dropped on purpose and is not reused.
 # The id U09 was once used for symlink validity, which was removed (symlinks are out of scope); it is reused here.
 # If a rule fails, change the layout or change the rule (and say why).
-# Rule types are implemented in check_layout.py.
+# Rule types are implemented in internal/layout/rules.go; `bento-layout check` runs them.
 
 [[rule]]
 id = "U02"

@@ -85,7 +85,7 @@ func TestInitDryRunPathsRelativeToCwd(t *testing.T) {
 	}
 	cwd := t.TempDir()
 	t.Chdir(cwd)
-	code, out, _ := run(t, "init", dir, "-n")
+	code, out, _ := run(t, "init", dir, ".", "-n")
 	if code != 0 || !strings.Contains(out, "would create alpha\n") ||
 		!strings.Contains(out, "would create alpha"+string(filepath.Separator)+"inner\n") {
 		t.Fatalf("target .: code = %d, stdout = %q", code, out)
@@ -98,6 +98,13 @@ func TestInitDryRunPathsRelativeToCwd(t *testing.T) {
 	code, out, _ = run(t, "init", dir, filepath.Join(cwd, "abs"), "-n")
 	if code != 0 || !strings.Contains(out, "would create abs"+string(filepath.Separator)+"alpha\n") {
 		t.Fatalf("absolute target: code = %d, stdout = %q", code, out)
+	}
+}
+
+func TestInitRequiresTarget(t *testing.T) {
+	code, _, errOut := run(t, "init", "mini", "--layouts-dir", layoutsDir)
+	if code != 1 || !strings.Contains(errOut, "accepts 2 arg(s), received 1") {
+		t.Errorf("code = %d, stderr = %q", code, errOut)
 	}
 }
 
@@ -150,5 +157,91 @@ func TestInitRepairsDamagedLayout(t *testing.T) {
 	}
 	if data, err := os.ReadFile(keep); err != nil || string(data) != "data" {
 		t.Errorf("existing file touched: %q, %v", data, err)
+	}
+}
+
+func TestCheckPasses(t *testing.T) {
+	layouts := filepath.Join("..", "..", "layouts")
+	drive := t.TempDir()
+	if code, _, errOut := run(t, "init", "personal", drive, "--layouts-dir", layouts); code != 0 {
+		t.Fatalf("init: %q", errOut)
+	}
+	code, out, errOut := run(t, "check", "--layout", "personal", "--path", drive, "--layouts-dir", layouts)
+	if code != 0 {
+		t.Fatalf("code = %d, stdout = %q, stderr = %q", code, out, errOut)
+	}
+	if !strings.Contains(out, "-- personal: 17 rules, 0 failing") {
+		t.Errorf("stdout = %q", out)
+	}
+}
+
+func TestCheckFailingLayoutExitsNonZero(t *testing.T) {
+	// mini has top-level folders no scenario uses, so U08 fails.
+	code, out, _ := run(t, "check", "--layout", "mini", "--path", t.TempDir(), "--layouts-dir", layoutsDir, "--rules", filepath.Join("..", "..", "layouts", "rules.toml"))
+	if code != 1 {
+		t.Fatalf("code = %d, want 1", code)
+	}
+	if !strings.Contains(out, "FAIL  U08") || !strings.Contains(out, "no scenario uses top-level folder: beta") {
+		t.Errorf("stdout = %q", out)
+	}
+}
+
+func TestCheckMissingRules(t *testing.T) {
+	code, _, errOut := run(t, "check", "--layout", "mini", "--path", t.TempDir(), "--layouts-dir", layoutsDir)
+	if code != 1 || !strings.Contains(errOut, "rules.toml") {
+		t.Errorf("code = %d, stderr = %q", code, errOut)
+	}
+}
+
+func TestCheckRequiresBothFlags(t *testing.T) {
+	layouts := filepath.Join("..", "..", "layouts")
+	tests := []struct {
+		name string
+		args []string
+		want string
+	}{
+		{"no flags", []string{"check", "--layouts-dir", layouts}, "required flag(s)"},
+		{"no path", []string{"check", "--layout", "personal", "--layouts-dir", layouts}, `"path"`},
+		{"no layout", []string{"check", "--path", t.TempDir(), "--layouts-dir", layouts}, `"layout"`},
+		{"positional", []string{"check", "personal", "--layout", "personal", "--path", t.TempDir()}, "unknown command"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			code, _, errOut := run(t, tt.args...)
+			if code != 1 || !strings.Contains(errOut, tt.want) {
+				t.Errorf("code = %d, stderr = %q, want containing %q", code, errOut, tt.want)
+			}
+		})
+	}
+}
+
+func TestCheckPathMustExist(t *testing.T) {
+	code, _, errOut := run(t, "check", "--layout", "personal", "--path", filepath.Join(t.TempDir(), "nope"),
+		"--layouts-dir", filepath.Join("..", "..", "layouts"))
+	if code != 1 || errOut == "" {
+		t.Errorf("code = %d, stderr = %q", code, errOut)
+	}
+}
+
+func TestCheckPathAgainstCreatedLayout(t *testing.T) {
+	layouts := filepath.Join("..", "..", "layouts")
+	drive := t.TempDir()
+	if code, _, errOut := run(t, "init", "personal", drive, "--layouts-dir", layouts); code != 0 {
+		t.Fatalf("init: %q", errOut)
+	}
+	code, out, errOut := run(t, "check", "--layout", "personal", "--path", drive, "--layouts-dir", layouts)
+	if code != 0 || !strings.Contains(out, "matches the layout") {
+		t.Fatalf("code = %d, stdout = %q, stderr = %q", code, out, errOut)
+	}
+
+	if err := os.Remove(filepath.Join(drive, "config", "secrets")); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(filepath.Join(drive, "stray"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	code, out, _ = run(t, "check", "--layout", "personal", "--path", drive, "--layouts-dir", layouts)
+	if code != 1 || !strings.Contains(out, "MISSING   config/secrets") || !strings.Contains(out, "extra     stray") {
+		t.Errorf("code = %d, stdout = %q", code, out)
 	}
 }
