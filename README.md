@@ -4,7 +4,7 @@ A standard folder layout for a portable drive, plus a small CLI to create and ch
 
 **Not to be confused with "bento grid" UI design.** `bento-layout` is a tool for folder layout management. The name comes from the bento box: one container with fixed compartments.
 
-> **Status:** pre-alpha. The layout is still being designed. The CLI is only a skeleton (it can print its version) and layout creation and checking are not implemented yet. See the [roadmap](ROADMAP.md).
+> **Status:** v0.1, early. The `init` and `check` commands work and the `personal` layout has been used to migrate a real drive. The layout is still a draft and not frozen, so expect changes before v1.0. See the [roadmap](ROADMAP.md).
 
 ## Idea
 
