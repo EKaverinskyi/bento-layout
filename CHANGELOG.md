@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-16
+
 ### Added
 
 - `check --layout <layout> --path <dir>` command and rule engine (ported from the Python prototype): both flags are required. Checks the layout against the universal rules (`--rules`, default `<layouts-dir>/rules.toml`) and its own rules and scenarios, then compares the real directory with it. Missing folders fail, extra folders are only listed. Exits 1 on any failure or incomplete layout.
